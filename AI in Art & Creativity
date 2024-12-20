@@ -1,0 +1,73 @@
+import javax.swing.*;
+import java.awt.*;
+import java.util.Random;
+
+public class AbstractArtGenerator extends JPanel {
+
+    private Random random;
+
+    public AbstractArtGenerator() {
+        random = new Random();
+        setPreferredSize(new Dimension(800, 600)); // Set canvas size
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Set a random background color
+        g2d.setColor(getRandomColor());
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+
+        // Generate random abstract shapes
+        for (int i = 0; i < 50; i++) {
+            drawRandomShape(g2d);
+        }
+
+        // Optionally, draw a random line as a finishing touch
+        g2d.setColor(getRandomColor());
+        g2d.setStroke(new BasicStroke(random.nextInt(10) + 1)); // Random line thickness
+        g2d.drawLine(random.nextInt(getWidth()), random.nextInt(getHeight()), random.nextInt(getWidth()), random.nextInt(getHeight()));
+    }
+
+    private void drawRandomShape(Graphics2D g2d) {
+        // Random shape type (circle or rectangle)
+        if (random.nextBoolean()) {
+            // Draw a random circle
+            g2d.setColor(getRandomColor());
+            int x = random.nextInt(getWidth());
+            int y = random.nextInt(getHeight());
+            int diameter = random.nextInt(100) + 20; // Random size
+            g2d.fillOval(x, y, diameter, diameter);
+        } else {
+            // Draw a random rectangle
+            g2d.setColor(getRandomColor());
+            int x = random.nextInt(getWidth());
+            int y = random.nextInt(getHeight());
+            int width = random.nextInt(150) + 50;
+            int height = random.nextInt(150) + 50;
+            g2d.fillRect(x, y, width, height);
+        }
+    }
+
+    private Color getRandomColor() {
+        // Generate random RGB values
+        int r = random.nextInt(256);
+        int g = random.nextInt(256);
+        int b = random.nextInt(256);
+        return new Color(r, g, b);
+    }
+
+    public static void main(String[] args) {
+        // Set up the JFrame
+        JFrame frame = new JFrame("Generative Abstract Art");
+        AbstractArtGenerator artGenerator = new AbstractArtGenerator();
+        frame.add(artGenerator);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+}
