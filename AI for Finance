@@ -1,0 +1,56 @@
+import weka.classifiers.functions.LinearRegression;
+import weka.core.Instances;
+import weka.core.converters.CSVLoader;
+
+import java.io.File;
+import java.io.IOException;
+
+public class StockPricePrediction {
+
+    public static void main(String[] args) {
+        try {
+            // Load the stock data (CSV file)
+            CSVLoader loader = new CSVLoader();
+            loader.setSource(new File("path_to_your_stock_data.csv"));
+            Instances data = loader.getDataSet();
+
+            // Set the class index (the attribute you want to predict, typically "Close" price)
+            data.setClassIndex(data.numAttributes() - 1);
+
+            // Split the data into training and testing sets (80% training, 20% testing)
+            int trainSize = (int) Math.round(data.numInstances() * 0.8);
+            int testSize = data.numInstances() - trainSize;
+            Instances trainData = new Instances(data, 0, trainSize);
+            Instances testData = new Instances(data, trainSize, testSize);
+
+            // Initialize and train the Linear Regression model
+            LinearRegression model = new LinearRegression();
+            model.buildClassifier(trainData);
+
+            // Evaluate the model with the test set
+            double mae = evaluateModel(model, testData);
+            System.out.println("Mean Absolute Error: " + mae);
+
+            // Make predictions for the next stock prices (example with one instance)
+            double predictedPrice = model.classifyInstance(testData.instance(0));
+            System.out.println("Predicted Stock Price: " + predictedPrice);
+
+        } catch (IOException | Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Evaluate the model with the test data
+    private static double evaluateModel(LinearRegression model, Instances testData) throws Exception {
+        double sumError = 0;
+        int count = testData.numInstances();
+
+        for (int i = 0; i < count; i++) {
+            double actualValue = testData.instance(i).classValue();
+            double predictedValue = model.classifyInstance(testData.instance(i));
+            sumError += Math.abs(actualValue - predictedValue);
+        }
+
+        return sumError / count; // Return the Mean Absolute Error (MAE)
+    }
+}
